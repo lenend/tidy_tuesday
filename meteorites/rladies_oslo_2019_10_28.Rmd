@@ -18,6 +18,7 @@ params:
 ```{r setup, include=FALSE}
 options(htmltools.dir.version = FALSE)
 knitr::opts_chunk$set(eval = TRUE)
+knitr::opts_chunk$set(fig.width=12, fig.height=6) 
 ```
 
 # What is Tidy tuesday?
@@ -25,12 +26,12 @@ knitr::opts_chunk$set(eval = TRUE)
 https://github.com/rfordatascience/tidytuesday
 ---
 
-# I want to learn about maps and animation!
+# I want to learn about maps and animation! > What about meteorites?
 ![](guardian.png)
 https://www.theguardian.com/news/datablog/interactive/2013/feb/15/meteorite-fall-map
 ---
 
-# Data has space and time!
+# Meterites data has space and time!
 ```{r, data, message = FALSE}
 library(tidyverse)
 library(maps)
@@ -49,7 +50,7 @@ https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2
 # Plot the points with ggplot
 ```{r, points}
 points <- ggplot() + geom_point(data = meteorites, 
-  aes(x = long, y = lat), color = 'orange', alpha = 0.7, show.legend = F)
+  aes(x = long, y = lat, size = mass), color = 'orange', show.legend = F)
 ```
 ```{r, points_out, echo = FALSE}
 points
@@ -61,9 +62,9 @@ points
 https://ggplot2.tidyverse.org/reference/map_data.html
 
 ```{r, first_map}
-points_on_map  <- points + geom_polygon(
-  data = map_data("world"), aes(x=long, y = lat, group = group), fill="grey", alpha=0.3
-  ) + coord_map() + theme_void()
+points_on_map  <- points + geom_polygon(data = map_data("world"), 
+  aes(x=long, y=lat, group=group),
+  fill="grey", alpha=0.3) + coord_map() + theme_void()
 ```
 ```{r, first_map_out, echo = FALSE}
 points_on_map
@@ -72,9 +73,9 @@ points_on_map
 
 # Ok! :)
 ```{r, better_map}
-points_on_map  <- points + geom_polygon(
-  data = map_data("world"), aes(x=long, y = lat, group = group), fill="grey", alpha=0.3
-  ) + coord_map(xlim = c(-180, 180)) + theme_void() #<<
+points_on_map  <- points + geom_polygon(data = map_data("world"), 
+  aes(x=long, y=lat, group=group),
+  fill="grey", alpha=0.3) + coord_map(xlim = c(-180, 180)) + theme_void()
 ```
 ```{r, better_map_out, echo = FALSE}
 points_on_map
@@ -96,16 +97,16 @@ meteorites_animation
 ---
 
 # Fix it with a group!
-```{r, group-points}
-points <- ggplot() +
-  geom_point(
-    data = meteorites, 
-    aes(x = long, y = lat, group = year), #<<
-    color = 'orange',
-    alpha = 0.7,
-    show.legend = F
-  )
+>The group aesthetic defines how the data in a layer is matched across the animation.
 
+```{r, group-points}
+points <- ggplot() + geom_point(data = meteorites, 
+  aes(x = long, y = lat, size = mass, group = year), #<<
+  color = 'orange', show.legend = F)
+```
+---
+# Fix it with a group!
+```{r, group-points2}
 meteorites_animation <- points +
   transition_time(year) +
   shadow_mark(past = TRUE, future = FALSE)
@@ -114,15 +115,18 @@ meteorites_animation <- points +
 meteorites_animation
 ```
 ![](rladies_oslo_2019_10_28_files/figure-html/group_points_out-1.gif)
-The group aesthetic defines how the data in a layer is matched across the animation.
+
 ---
 
 # Map + animation = sloooooooooow?
-```{r, map_4min}
+```{r, include = F}
 points_on_map <- points +
   geom_polygon(data = map_data("world"),aes(x=long, y = lat, group = group), fill="grey", alpha=0.3) + 
   coord_map(xlim = c(-180, 180)) + theme_void()
+```
 
+```{r, map_4min}
+# Remember to re-run points_on_map code after adding the group (hidden)
 meteorites_animation <- points_on_map +
   transition_time(year) +
   shadow_mark(past = TRUE, future = FALSE)
