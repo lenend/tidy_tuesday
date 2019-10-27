@@ -1,7 +1,7 @@
 ---
 title: "Tidy Tuesday: Meteorites!"
-author: "Lene"
-date: "2019-10-27"
+author: "Lene Drøsdal"
+date: "2019-10-28"
 output:
   xaringan::moon_reader:
     css: ["default", "rladies", "rladies-fonts"]
@@ -126,7 +126,7 @@ meteorites_animation
 
 ```{r, focus}
 meteorites_animation <- points +
-  transition_time(year, range = c(1930, 2013)) +
+  transition_time(year, range = c(1300, 2013)) +
   shadow_mark(past = TRUE, future = FALSE)
 ```
 ```{r, focus_out, include = FALSE, eval = params$create_animations}
@@ -146,7 +146,7 @@ points_on_map <- points + geom_polygon(data = map_data("world"),
 ```{r, map_4min}
 # Remember to re-run points_on_map code after adding the group (hidden)
 meteorites_animation <- points_on_map +
-  transition_time(year, range = c(1930, 2013)) +
+  transition_time(year, range = c(1300, 2013)) +
   shadow_mark(past = TRUE, future = FALSE)
 ```
 ```{r, map_4min_out, include = FALSE, eval = params$create_animations}

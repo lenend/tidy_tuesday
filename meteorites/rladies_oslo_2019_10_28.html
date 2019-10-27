@@ -3,8 +3,8 @@
   <head>
     <title>Tidy Tuesday: Meteorites!</title>
     <meta charset="utf-8" />
-    <meta name="author" content="Lene" />
-    <meta name="date" content="2019-10-27" />
+    <meta name="author" content="Lene Drøsdal" />
+    <meta name="date" content="2019-10-28" />
     <link href="libs/remark-css/default.css" rel="stylesheet" />
     <link href="libs/remark-css/rladies.css" rel="stylesheet" />
     <link href="libs/remark-css/rladies-fonts.css" rel="stylesheet" />
@@ -14,8 +14,8 @@
 class: center, middle, inverse, title-slide
 
 # Tidy Tuesday: Meteorites!
-### Lene
-### 2019-10-27
+### Lene Drøsdal
+### 2019-10-28
 
 ---
 
@@ -205,7 +205,7 @@ meteorites_animation &lt;- points +
 
 ```r
 meteorites_animation &lt;- points +
-  transition_time(year, range = c(1930, 2013)) +
+  transition_time(year, range = c(1300, 2013)) +
   shadow_mark(past = TRUE, future = FALSE)
 ```
 
@@ -220,7 +220,7 @@ meteorites_animation &lt;- points +
 ```r
 # Remember to re-run points_on_map code after adding the group (hidden)
 meteorites_animation &lt;- points_on_map +
-  transition_time(year, range = c(1930, 2013)) +
+  transition_time(year, range = c(1300, 2013)) +
   shadow_mark(past = TRUE, future = FALSE)
 ```
 
