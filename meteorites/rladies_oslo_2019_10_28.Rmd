@@ -1,0 +1,153 @@
+---
+title: "Tidy tuesday: Meteorites!"
+author: "Lene"
+date: "2019-10-27"
+output:
+  xaringan::moon_reader:
+    css: ["default", "rladies", "rladies-fonts"]
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      highlightSpans: true
+params:
+  create_animations: FALSE
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(eval = TRUE)
+```
+
+# What is Tidy tuesday?
+![](https://github.com/rfordatascience/tidytuesday/blob/master/static/tt_logo.png?raw=true)
+https://github.com/rfordatascience/tidytuesday
+---
+
+# I want to learn about maps and animation!
+![](guardian.png)
+https://www.theguardian.com/news/datablog/interactive/2013/feb/15/meteorite-fall-map
+---
+
+# Data has space and time!
+```{r, data, message = FALSE}
+library(tidyverse)
+library(maps)
+library(gganimate)
+
+meteorites <- readr::read_csv("meteorites.csv") %>% 
+  tidyr::drop_na() %>% dplyr::filter(geolocation != '(0.0, 0.0)')
+```
+```{r table, echo = FALSE}
+meteorites %>% head() %>% select(-geolocation) %>% knitr::kable(format='html')
+```
+https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-06-11/meteorites.csv
+
+---
+
+# Plot the points with ggplot
+```{r, points}
+points <- ggplot() + geom_point(data = meteorites, 
+  aes(x = long, y = lat), color = 'orange', alpha = 0.7, show.legend = F)
+```
+```{r, points_out, echo = FALSE}
+points
+```
+
+---
+
+# First map! ... not exactly right
+https://ggplot2.tidyverse.org/reference/map_data.html
+
+```{r, first_map}
+points_on_map  <- points + geom_polygon(
+  data = map_data("world"), aes(x=long, y = lat, group = group), fill="grey", alpha=0.3
+  ) + coord_map() + theme_void()
+```
+```{r, first_map_out, echo = FALSE}
+points_on_map
+```
+---
+
+# Ok! :)
+```{r, better_map}
+points_on_map  <- points + geom_polygon(
+  data = map_data("world"), aes(x=long, y = lat, group = group), fill="grey", alpha=0.3
+  ) + coord_map(xlim = c(-180, 180)) + theme_void() #<<
+```
+```{r, better_map_out, echo = FALSE}
+points_on_map
+```
+https://github.com/tidyverse/ggplot2/issues/1104
+---
+
+# Animate!
+https://gganimate.com/
+```{r, first-animation}
+meteorites_animation <- points +
+  transition_time(year) +
+  shadow_mark(past = TRUE, future = FALSE)
+```
+```{r, first_animation_out, include = FALSE, eval = params$create_animations}
+meteorites_animation
+```
+![](rladies_oslo_2019_10_28_files/figure-html/first_animation_out-1.gif)
+---
+
+# Fix it with a group!
+```{r, group-points}
+points <- ggplot() +
+  geom_point(
+    data = meteorites, 
+    aes(x = long, y = lat, group = year), #<<
+    color = 'orange',
+    alpha = 0.7,
+    show.legend = F
+  )
+
+meteorites_animation <- points +
+  transition_time(year) +
+  shadow_mark(past = TRUE, future = FALSE)
+```
+```{r, group_points_out, include = FALSE, eval = params$create_animations}
+meteorites_animation
+```
+![](rladies_oslo_2019_10_28_files/figure-html/group_points_out-1.gif)
+The group aesthetic defines how the data in a layer is matched across the animation.
+---
+
+# Map + animation = sloooooooooow?
+```{r, map_4min}
+points_on_map <- points +
+  geom_polygon(data = map_data("world"),aes(x=long, y = lat, group = group), fill="grey", alpha=0.3) + 
+  coord_map(xlim = c(-180, 180)) + theme_void()
+
+meteorites_animation <- points_on_map +
+  transition_time(year) +
+  shadow_mark(past = TRUE, future = FALSE)
+```
+```{r, map_4min_out, include = FALSE, eval = params$create_animations}
+meteorites_animation
+```
+![](rladies_oslo_2019_10_28_files/figure-html/map_4min_out-1.gif)
+---
+
+# ALways use 100 frames -> redraw the plot 100 times..
+```{r, set_nframes, eval = params$create_animations}
+animate(meteorites_animation, nframes = 40, end_pause = 10)
+```
+![](rladies_oslo_2019_10_28_files/figure-html/set_nframes-1.gif)
+
+---
+
+# Almost there.. skip first first
+```{r, last_one}
+meteorites_animation <- points_on_map +
+  transition_time(year, range = c(1930, 2013)) +
+  shadow_mark(past = TRUE, future = FALSE)
+```
+```{r, last_one_out, include = FALSE, eval = params$create_animations}
+animate(meteorites_animation, nframes = 40, end_pause = 10)
+```
+![](rladies_oslo_2019_10_28_files/figure-html/last_one_out-1.gif)
