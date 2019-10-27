@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+  <head>
+    <title>Tidy Tuesday: Meteorites!</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Lene" />
+    <meta name="date" content="2019-10-27" />
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/remark-css/rladies.css" rel="stylesheet" />
+    <link href="libs/remark-css/rladies-fonts.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Tidy Tuesday: Meteorites!
+### Lene
+### 2019-10-27
+
+---
+
+
+
+
+# What is Tidy Tuesday?
+![](https://github.com/rfordatascience/tidytuesday/blob/master/static/tt_logo.png?raw=true)
+https://github.com/rfordatascience/tidytuesday
+---
+
+# I want to learn about maps and animation! What about meteorites?
+![](guardian.png)
+https://www.theguardian.com/news/datablog/interactive/2013/feb/15/meteorite-fall-map
+---
+
+# Meteorites data has space and time!
+
+```r
+library(tidyverse)
+library(maps)
+library(gganimate)
+
+meteorites &lt;- readr::read_csv("meteorites.csv") %&gt;% 
+  tidyr::drop_na() %&gt;% dplyr::filter(geolocation != '(0.0, 0.0)')
+```
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; name &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; id &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; name_type &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; class &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; mass &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; fall &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; year &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; lat &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; long &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Aachen &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Valid &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; L5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 21 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Fell &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1880 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 50.77500 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.08333 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Aarhus &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Valid &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; H6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 720 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Fell &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1951 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 56.18333 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10.23333 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Abee &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Valid &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; EH4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 107000 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Fell &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1952 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 54.21667 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -113.00000 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Acapulco &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Valid &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Acapulcoite &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1914 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Fell &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1976 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 16.88333 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -99.90000 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Achiras &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 370 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Valid &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; L6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 780 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Fell &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1902 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -33.16667 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -64.95000 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Adhi Kot &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 379 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Valid &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; EH4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4239 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Fell &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1919 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 32.10000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 71.80000 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-06-11/meteorites.csv
+
+---
+
+# Start with good old ggplot
+
+```r
+points &lt;- ggplot() + geom_point(data = meteorites, 
+  aes(x = long, y = lat, size = mass), color = 'orange', show.legend = F)
+```
+![](rladies_oslo_2019_10_28_files/figure-html/points_out-1.png)&lt;!-- --&gt;
+
+---
+
+# First map! ... not exactly right?!
+https://ggplot2.tidyverse.org/reference/map_data.html
+
+
+```r
+points_on_map  &lt;- points + geom_polygon(data = map_data("world"), 
+  aes(x=long, y=lat, group=group),
+  fill="grey", alpha=0.3) + coord_map() + theme_void()
+```
+![](rladies_oslo_2019_10_28_files/figure-html/first_map_out-1.png)&lt;!-- --&gt;
+---
+
+# ..but simple fix to xlim will do :)
+
+```r
+points_on_map  &lt;- points + geom_polygon(data = map_data("world"), 
+  aes(x=long, y=lat, group=group),
+  fill="grey", alpha=0.3) + coord_map(xlim = c(-180, 180)) + theme_void()
+```
+![](rladies_oslo_2019_10_28_files/figure-html/better_map_out-1.png)&lt;!-- --&gt;
+https://github.com/tidyverse/ggplot2/issues/1104
+---
+class:inverse, center, middle
+# Animate!
+https://gganimate.com/
+
+---
+# My first animation!
+
+```r
+meteorites_animation &lt;- points +
+  transition_time(year) +
+  shadow_mark(past = TRUE, future = FALSE)
+```
+
+![](rladies_oslo_2019_10_28_files/figure-html/first_animation_out-1.gif)
+..but why are the points moving around like that?
+---
+
+# aes(group = year) makes sure we don't animate between years!
+&gt;The group aesthetic defines how the data in a layer is matched across the animation. https://gganimate.com/
+
+
+```r
+points &lt;- ggplot() + geom_point(data = meteorites, 
+* aes(x = long, y = lat, size = mass, group = year),
+  color = 'orange', show.legend = F)
+```
+---
+# aes(group = year) makes sure we don't animate between years!
+
+```r
+meteorites_animation &lt;- points +
+  transition_time(year) +
+  shadow_mark(past = TRUE, future = FALSE)
+```
+
+![](rladies_oslo_2019_10_28_files/figure-html/group_points_out-1.gif)
+
+---
+
+# Focus the animation to the years that matter!
+
+
+```r
+meteorites_animation &lt;- points +
+  transition_time(year, range = c(1930, 2013)) +
+  shadow_mark(past = TRUE, future = FALSE)
+```
+
+![](rladies_oslo_2019_10_28_files/figure-html/focus_out-1.gif)
+
+---
+
+# Map + Animation = &lt;3
+
+
+
+```r
+# Remember to re-run points_on_map code after adding the group (hidden)
+meteorites_animation &lt;- points_on_map +
+  transition_time(year, range = c(1930, 2013)) +
+  shadow_mark(past = TRUE, future = FALSE)
+```
+
+![](rladies_oslo_2019_10_28_files/figure-html/map_4min_out-1.gif)
+..but it does take several minutes to render
+---
+
+# Reduce render time using nframes and voila!
+
+```r
+animate(meteorites_animation, nframes = 40, end_pause = 10, duration = 10)
+```
+![](rladies_oslo_2019_10_28_files/figure-html/final-1.gif)
+
+
+---
+
+
+class:inverse, center, middle
+
+# Please come back 3rd of Desember!
+https://www.meetup.com/rladies-oslo/events/264701504/
+![](https://secure.meetupstatic.com/photos/event/3/1/f/8/highres_484752792.jpeg)
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"highlightSpans": true
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
